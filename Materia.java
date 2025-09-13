@@ -1,23 +1,19 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Materia {
     private String nombre;
-    private int cuposDisponibles;
-    private String horario;
+    private List<Clase> clasesDisponibles;
 
-    public Materia(String nombre, int cuposDisponibles, String horario) {
+    public Materia(String nombre) {
         this.nombre = nombre;
-        this.cuposDisponibles = cuposDisponibles;
-        this.horario = horario;
+        this.clasesDisponibles = new ArrayList<>();
     }
 
     public String getNombre() { return nombre; }
-    public String getHorario() { return horario; }
-    public int getCuposDisponibles() { return cuposDisponibles; }
+    public List<Clase> getClasesDisponibles() { return clasesDisponibles; }
 
-    public boolean asignarCupo(Estudiante estudiante) {
-        if (cuposDisponibles > 0) {
-            cuposDisponibles--;
-            return true;
-        }
-        return false;
+    public void agregarClase(Clase clase) {
+        clasesDisponibles.add(clase);
     }
 }
