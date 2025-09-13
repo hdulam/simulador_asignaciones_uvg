@@ -1,19 +1,35 @@
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Materia {
+
     private String nombre;
-    private List<Clase> clasesDisponibles;
+    private List<Clase> clases;
 
     public Materia(String nombre) {
         this.nombre = nombre;
-        this.clasesDisponibles = new ArrayList<>();
+        this.clases = new ArrayList<>();
     }
 
-    public String getNombre() { return nombre; }
-    public List<Clase> getClasesDisponibles() { return clasesDisponibles; }
-
     public void agregarClase(Clase clase) {
-        clasesDisponibles.add(clase);
+        clases.add(clase);
+    }
+
+    public List<Clase> getClasesDisponibles() {
+        return new ArrayList<>(clases);
+    }
+
+    public Clase getClaseDisponible() {
+        for (Clase c : clases) {
+            if (c.getCuposDisponibles() > 0) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public String getNombre() {
+        return nombre;
     }
 }

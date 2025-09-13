@@ -1,4 +1,6 @@
+
 public class Clase {
+
     private String horario;
     private int cuposDisponibles;
 
@@ -7,8 +9,13 @@ public class Clase {
         this.cuposDisponibles = cuposDisponibles;
     }
 
-    public String getHorario() { return horario; }
-    public int getCuposDisponibles() { return cuposDisponibles; }
+    public String getHorario() {
+        return horario;
+    }
+
+    public int getCuposDisponibles() {
+        return cuposDisponibles;
+    }
 
     public boolean asignarCupo(Estudiante estudiante) {
         if (cuposDisponibles > 0) {
