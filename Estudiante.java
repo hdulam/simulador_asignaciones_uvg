@@ -66,4 +66,17 @@ public class Estudiante {
     public Horario getHorario() {
         return horario;
     }
+public String getNombre(){
+        return nombre;
+    }
+    public String getCodigo(){
+        return codigo;
+    }    
 }
+public String getClasesInscritas() {
+        String resultado = "";
+        for (Clase c : clasesInscritas) {
+            resultado += c.getHorario() + " ";
+        }
+        return resultado.trim();
+    }
