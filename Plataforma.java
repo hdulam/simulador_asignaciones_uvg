@@ -32,9 +32,9 @@ public class Plataforma {
     }
 
     private void inicializarUsuarios() {
-        usuarios.add(new Estudiante("Juan Pérez", "2025001"));
-        usuarios.add(new Estudiante("Ana Gómez", "2025002"));
-        usuarios.add(new Estudiante("Luis Martínez", "2025003"));
+        usuarios.add(new Estudiante("Juan Pérez", "25932"));
+        usuarios.add(new Estudiante("Ana Gómez", "251293"));
+        usuarios.add(new Estudiante("Luis Martínez", "251190"));
     }
 
     public boolean iniciarSesion(String codigo, String contrasena) {

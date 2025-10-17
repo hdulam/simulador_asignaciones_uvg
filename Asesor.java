@@ -1,6 +1,5 @@
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Asesor {
 
@@ -19,13 +18,22 @@ public class Asesor {
     }
 
     public void recomendarMateria(Estudiante estudiante) {
+        String recomendacion = getRecomendacion(estudiante);
+        // cambio: mostrar recomendación por popup en GUI
+        javax.swing.JOptionPane.showMessageDialog(null, recomendacion, "Recomendación", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // Nuevo método agregado
+    public String getRecomendacion(Estudiante estudiante) {
         String carrera = estudiante.getCarrera();
-        if ("Ingenieria".equals(carrera)) {
-            System.out.println("Recomendado: POO y Calculo");
-        } else if ("Medicina".equals(carrera)) {
-            System.out.println("Recomendado: Biologia y Quimica");
+        if ("Ingenieria".equalsIgnoreCase(carrera)) {
+            return "Recomendado: POO y Calculo";
+        } else if ("Medicina".equalsIgnoreCase(carrera)) {
+            return "Recomendado: Biologia y Quimica";
+        } else if ("Arquitectura".equalsIgnoreCase(carrera)) {
+            return "Recomendado: Dibujo y Diseño";
         } else {
-            System.out.println("Materias basicas: Matematicas");
+            return "Materias básicas: Matematicas";
         }
     }
 
