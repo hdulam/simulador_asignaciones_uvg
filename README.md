@@ -47,3 +47,10 @@ Este sistema busca simular el proceso de inscripción, permitiendo a los estudia
 - **JDBC / Hibernate**
 - **Swing**  
 - **Pendiente de definir** 
+
+## Para compilar usar:
+javac -cp ".:libs/itextpdf-5.5.13.jar" PlataformaGUI.java
+
+Y para ejecutarla:
+
+java -cp ".:libs/itextpdf-5.5.13.jar" PlataformaGUI

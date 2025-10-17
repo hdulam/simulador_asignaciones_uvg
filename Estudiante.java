@@ -1,8 +1,5 @@
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Estudiante {
 
@@ -13,11 +10,7 @@ public class Estudiante {
     private Horario horario;
 
     public Estudiante(String nombre, String codigo) {
-        this.nombre = nombre;
-        this.codigo = codigo;
-        this.carrera = "Ingenieria";
-        this.inscripciones = new HashMap<>();
-        this.horario = new Horario();
+        this(nombre, codigo, "Ingeniería");
     }
 
     public Estudiante(String nombre, String codigo, String carrera) {
@@ -66,17 +59,4 @@ public class Estudiante {
     public Horario getHorario() {
         return horario;
     }
-public String getNombre(){
-        return nombre;
-    }
-    public String getCodigo(){
-        return codigo;
-    }    
 }
-public String getClasesInscritas() {
-        String resultado = "";
-        for (Clase c : clasesInscritas) {
-            resultado += c.getHorario() + " ";
-        }
-        return resultado.trim();
-    }
