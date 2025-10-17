@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -23,6 +22,13 @@ public class PlataformaGUI extends JFrame {
 
     public PlataformaGUI() {
         plataforma = new Plataforma();
+
+        // --- USUARIOS PREDEFINIDOS ---
+        plataforma.agregarUsuario(new Estudiante("Juan Pérez", "25932", "Ingenieria"));
+        plataforma.agregarUsuario(new Estudiante("Ana López", "251293", "Medicina"));
+        plataforma.agregarUsuario(new Estudiante("Carlos Méndez", "251190", "Ingenieria"));
+        // Puedes agregar más usuarios aquí si quieres
+
         setTitle("Sistema de Inscripcion");
         setSize(500, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -38,7 +44,6 @@ public class PlataformaGUI extends JFrame {
         loginBtn = new JButton("Login");
         loginPanel.add(loginBtn);
         loginPanel.add(new JLabel(""));
-
         add(loginPanel, BorderLayout.NORTH);
 
         materiasArea = new JTextArea();
@@ -58,19 +63,16 @@ public class PlataformaGUI extends JFrame {
         materiasCombo = new JComboBox<>();
         add(materiasCombo, BorderLayout.EAST);
 
+        // --- ACCIONES ---
         loginBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String codigo = codigoField.getText();
                 String pass = new String(passField.getPassword());
                 if (plataforma.iniciarSesion(codigo, pass)) {
                     estudianteActual = buscarEstudiante(codigo);
-                    if (estudianteActual == null) {
-                        estudianteActual = new Estudiante("Estudiante", codigo);
-                        plataforma.agregarUsuario(estudianteActual);
-                    }
                     mostrarMaterias();
                 } else {
-                    JOptionPane.showMessageDialog(null, "Login fallido");
+                    JOptionPane.showMessageDialog(null, "Login fallido. Usuario o contraseña incorrectos.");
                 }
             }
         });
@@ -102,20 +104,35 @@ public class PlataformaGUI extends JFrame {
         verHorarioBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (estudianteActual != null) {
-                    estudianteActual.verHorario();
-                    JOptionPane.showMessageDialog(null, "Horario generado (ver consola)");
+                    StringBuilder horarioStr = new StringBuilder();
+                    horarioStr.append("Horario de ").append(estudianteActual.getNombre()).append(":\n\n");
+                    for (String entrada : estudianteActual.getHorario().getEntradas()) {
+                        horarioStr.append(entrada).append("\n");
+                    }
+                    JOptionPane.showMessageDialog(null, horarioStr.toString(), "Horario", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
+
 
         recomendarBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (estudianteActual != null) {
                     Asesor asesor = new Asesor("Asesor Principal");
-                    asesor.recomendarMateria(estudianteActual);
+                    String carrera = estudianteActual.getCarrera();
+                    String mensaje;
+                    if ("Ingenieria".equals(carrera)) {
+                        mensaje = "Recomendado: POO y Calculo";
+                    } else if ("Medicina".equals(carrera)) {
+                        mensaje = "Recomendado: Biologia y Quimica";
+                    } else {
+                        mensaje = "Materias basicas: Matematicas";
+                    }
+                    JOptionPane.showMessageDialog(null, mensaje, "Recomendación del Asesor", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
+
 
         pdfBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

@@ -1,6 +1,6 @@
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Horario {
 
@@ -27,5 +27,8 @@ public class Horario {
         for (String e : entradas) {
             System.out.println(e);
         }
+    }
+    public List<String> getEntradas() {
+        return entradas;
     }
 }

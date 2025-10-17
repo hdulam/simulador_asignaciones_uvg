@@ -54,3 +54,10 @@ javac -cp ".:libs/itextpdf-5.5.13.jar" PlataformaGUI.java
 Y para ejecutarla:
 
 java -cp ".:libs/itextpdf-5.5.13.jar" PlataformaGUI
+
+## Usuarios predefinidos para testing:
+| Usuario (código) | Contraseña | Carrera    |
+| ---------------- | ---------- | ---------- |
+| 25932          | 123        | Ingeniería |
+| 251293          | 123        | Medicina   |
+| 251190          | 123        | Ingeniería |
