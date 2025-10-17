@@ -1,5 +1,8 @@
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import javax.swing.JOptionPane;
 
 public class Estudiante {
 
@@ -26,37 +29,34 @@ public class Estudiante {
             if (clase.asignarCupo(this)) {
                 inscripciones.put(materia, clase);
                 horario.agregarMateria(materia.getNombre(), clase.getHorario());
-                System.out.println("Inscrito en: " + materia.getNombre() + " - " + clase.getHorario());
+                JOptionPane.showMessageDialog(null, "Inscrito en: " + materia.getNombre() + " - " + clase.getHorario());
             } else {
-                System.out.println("No hay cupos disponibles en " + materia.getNombre());
+                JOptionPane.showMessageDialog(null, "No hay cupos disponibles en " + materia.getNombre());
             }
         } else {
-            System.out.println("Conflicto de horario con " + materia.getNombre());
+            JOptionPane.showMessageDialog(null, "Conflicto de horario con otra materia al intentar inscribirse en " + materia.getNombre());
         }
     }
 
     public void verHorario() {
-        System.out.println("Horario de " + nombre);
-        horario.mostrarHorario();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Horario de ").append(nombre).append(":\n\n");
+        for (Map.Entry<Materia, Clase> entry : inscripciones.entrySet()) {
+            sb.append(entry.getKey().getNombre())
+              .append(" - ")
+              .append(entry.getValue().getHorario())
+              .append("\n");
+        }
+        JOptionPane.showMessageDialog(null, sb.toString(), "Horario", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public String getNombre() {
-        return nombre;
+    public List<Clase> getClasesInscritas() {
+        return new ArrayList<>(inscripciones.values());
     }
 
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public String getCarrera() {
-        return carrera;
-    }
-
-    public Map<Materia, Clase> getInscripciones() {
-        return inscripciones;
-    }
-
-    public Horario getHorario() {
-        return horario;
-    }
+    public String getNombre() { return nombre; }
+    public String getCodigo() { return codigo; }
+    public String getCarrera() { return carrera; }
+    public Map<Materia, Clase> getInscripciones() { return inscripciones; }
+    public Horario getHorario() { return horario; }
 }

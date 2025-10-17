@@ -22,23 +22,17 @@ public class PlataformaGUI extends JFrame {
 
     public PlataformaGUI() {
         plataforma = new Plataforma();
-
-        // --- USUARIOS PREDEFINIDOS ---
-        plataforma.agregarUsuario(new Estudiante("Juan Pérez", "25932", "Ingenieria"));
-        plataforma.agregarUsuario(new Estudiante("Ana López", "251293", "Medicina"));
-        plataforma.agregarUsuario(new Estudiante("Carlos Méndez", "251190", "Ingenieria"));
-        // Puedes agregar más usuarios aquí si quieres
-
-        setTitle("Sistema de Inscripcion");
-        setSize(500, 400);
+        setTitle("Sistema de Inscripción");
+        setSize(600, 450);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        // --- Login panel ---
         JPanel loginPanel = new JPanel(new GridLayout(3, 2));
-        loginPanel.add(new JLabel("Codigo:"));
+        loginPanel.add(new JLabel("Código:"));
         codigoField = new JTextField();
         loginPanel.add(codigoField);
-        loginPanel.add(new JLabel("Contrasena:"));
+        loginPanel.add(new JLabel("Contraseña:"));
         passField = new JPasswordField();
         loginPanel.add(passField);
         loginBtn = new JButton("Login");
@@ -46,10 +40,13 @@ public class PlataformaGUI extends JFrame {
         loginPanel.add(new JLabel(""));
         add(loginPanel, BorderLayout.NORTH);
 
+        // --- Materias area ---
         materiasArea = new JTextArea();
+        materiasArea.setEditable(false);
         add(new JScrollPane(materiasArea), BorderLayout.CENTER);
 
-        JPanel botonesPanel = new JPanel(new GridLayout(1, 5));
+        // --- Botones ---
+        JPanel botonesPanel = new JPanel(new GridLayout(1, 4));
         inscribirBtn = new JButton("Inscribir");
         verHorarioBtn = new JButton("Ver Horario");
         recomendarBtn = new JButton("Recomendar");
@@ -60,85 +57,81 @@ public class PlataformaGUI extends JFrame {
         botonesPanel.add(pdfBtn);
         add(botonesPanel, BorderLayout.SOUTH);
 
+        // --- Combo materias ---
         materiasCombo = new JComboBox<>();
         add(materiasCombo, BorderLayout.EAST);
 
-        // --- ACCIONES ---
-        loginBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String codigo = codigoField.getText();
-                String pass = new String(passField.getPassword());
-                if (plataforma.iniciarSesion(codigo, pass)) {
-                    estudianteActual = buscarEstudiante(codigo);
-                    mostrarMaterias();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Login fallido. Usuario o contraseña incorrectos.");
-                }
+        // --- Login action ---
+        loginBtn.addActionListener(e -> {
+            String codigo = codigoField.getText();
+            String pass = new String(passField.getPassword());
+            if (plataforma.iniciarSesion(codigo, pass)) {
+                estudianteActual = buscarEstudiante(codigo);
+                JOptionPane.showMessageDialog(null, "Login exitoso: " + estudianteActual.getNombre());
+                mostrarMaterias();
+            } else {
+                JOptionPane.showMessageDialog(null, "Login fallido");
             }
         });
 
-        inscribirBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (estudianteActual != null && materiasCombo.getSelectedItem() != null) {
-                    String matSel = (String) materiasCombo.getSelectedItem();
-                    Materia mat = buscarMateria(matSel);
-                    if (mat != null) {
-                        Clase cl = null;
-                        for (Clase cc : mat.getClasesDisponibles()) {
-                            if (cc.getCuposDisponibles() > 0) {
-                                cl = cc;
-                                break;
-                            }
-                        }
-                        if (cl != null) {
-                            estudianteActual.inscribirClase(mat, cl);
-                            mostrarMaterias();
-                        } else {
-                            JOptionPane.showMessageDialog(null, "No hay cupos disponibles");
+        // --- Inscribir action ---
+        inscribirBtn.addActionListener(e -> {
+            if (estudianteActual != null && materiasCombo.getSelectedItem() != null) {
+                String matSel = (String) materiasCombo.getSelectedItem();
+                Materia mat = buscarMateria(matSel);
+                if (mat != null) {
+                    Clase cl = null;
+                    for (Clase cc : mat.getClasesDisponibles()) {
+                        if (cc.getCuposDisponibles() > 0) {
+                            cl = cc;
+                            break;
                         }
                     }
-                }
-            }
-        });
-
-        verHorarioBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (estudianteActual != null) {
-                    StringBuilder horarioStr = new StringBuilder();
-                    horarioStr.append("Horario de ").append(estudianteActual.getNombre()).append(":\n\n");
-                    for (String entrada : estudianteActual.getHorario().getEntradas()) {
-                        horarioStr.append(entrada).append("\n");
-                    }
-                    JOptionPane.showMessageDialog(null, horarioStr.toString(), "Horario", JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        });
-
-
-        recomendarBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (estudianteActual != null) {
-                    Asesor asesor = new Asesor("Asesor Principal");
-                    String carrera = estudianteActual.getCarrera();
-                    String mensaje;
-                    if ("Ingenieria".equals(carrera)) {
-                        mensaje = "Recomendado: POO y Calculo";
-                    } else if ("Medicina".equals(carrera)) {
-                        mensaje = "Recomendado: Biologia y Quimica";
+                    if (cl != null) {
+                        estudianteActual.inscribirClase(mat, cl);
+                        mostrarMaterias();
                     } else {
-                        mensaje = "Materias basicas: Matematicas";
+                        JOptionPane.showMessageDialog(null, "No hay cupos disponibles");
                     }
-                    JOptionPane.showMessageDialog(null, mensaje, "Recomendación del Asesor", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
 
-
-        pdfBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (estudianteActual != null) {
-                    generarPDF();
+        // --- Ver horario action ---
+        verHorarioBtn.addActionListener(e -> {
+            if (estudianteActual != null) {
+                StringBuilder sb = new StringBuilder("Horario de " + estudianteActual.getNombre() + ":\n\n");
+                for (Map.Entry<Materia, Clase> entry : estudianteActual.getInscripciones().entrySet()) {
+                    sb.append(entry.getKey().getNombre()).append(" - ").append(entry.getValue().getHorario()).append("\n");
                 }
+                if (sb.toString().equals("Horario de " + estudianteActual.getNombre() + ":\n\n")) {
+                    sb.append("No hay clases inscritas");
+                }
+                JOptionPane.showMessageDialog(null, sb.toString());
+            }
+        });
+
+        // --- Recomendar action ---
+        recomendarBtn.addActionListener(e -> {
+            if (estudianteActual != null) {
+                Asesor asesor = new Asesor("Asesor Principal");
+                String carrera = estudianteActual.getCarrera();
+                String recomendacion;
+                if ("Ingenieria".equals(carrera)) {
+                    recomendacion = "Recomendado: POO y Calculo";
+                } else if ("Medicina".equals(carrera)) {
+                    recomendacion = "Recomendado: Biologia y Quimica";
+                } else {
+                    recomendacion = "Materias básicas: Matemáticas";
+                }
+                JOptionPane.showMessageDialog(null, recomendacion);
+            }
+        });
+
+        // --- Generar PDF action ---
+        pdfBtn.addActionListener(e -> {
+            if (estudianteActual != null) {
+                generarPDF();
             }
         });
 
@@ -182,15 +175,14 @@ public class PlataformaGUI extends JFrame {
             Document doc = new Document();
             PdfWriter.getInstance(doc, new FileOutputStream(file));
             doc.open();
-            Paragraph titulo = new Paragraph("Horario de " + estudianteActual.getNombre());
-            doc.add(titulo);
+            doc.add(new Paragraph("Horario de " + estudianteActual.getNombre()));
             doc.add(new Paragraph(" "));
             PdfPTable tabla = new PdfPTable(2);
             PdfPCell c1 = new PdfPCell(new Paragraph("Materia"));
-            c1.setHorizontalAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
+            c1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
             tabla.addCell(c1);
             c1 = new PdfPCell(new Paragraph("Horario"));
-            c1.setHorizontalAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
+            c1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
             tabla.addCell(c1);
             tabla.setHeaderRows(1);
             for (Map.Entry<Materia, Clase> entry : estudianteActual.getInscripciones().entrySet()) {
@@ -207,6 +199,6 @@ public class PlataformaGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new PlataformaGUI());
+        SwingUtilities.invokeLater(PlataformaGUI::new);
     }
 }

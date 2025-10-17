@@ -1,18 +1,16 @@
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Plataforma {
 
-    List<Estudiante> usuarios;
-    List<Materia> materiasOfertadas;
-    boolean sesionActiva;
+    private List<Estudiante> usuarios;
+    private List<Materia> materiasOfertadas;
 
     public Plataforma() {
         this.usuarios = new ArrayList<>();
         this.materiasOfertadas = new ArrayList<>();
-        this.sesionActiva = false;
         inicializarMaterias();
+        inicializarUsuarios();
     }
 
     private void inicializarMaterias() {
@@ -33,37 +31,33 @@ public class Plataforma {
         materiasOfertadas.add(cal);
     }
 
+    private void inicializarUsuarios() {
+        usuarios.add(new Estudiante("Juan Pérez", "2025001"));
+        usuarios.add(new Estudiante("Ana Gómez", "2025002"));
+        usuarios.add(new Estudiante("Luis Martínez", "2025003"));
+    }
+
     public boolean iniciarSesion(String codigo, String contrasena) {
+        // Contraseña fija "123"
         for (Estudiante e : usuarios) {
-            if (e.getCodigo().equals(codigo) && contrasena.equals("123")) {
-                sesionActiva = true;
+            if (e.getCodigo().equals(codigo) && "123".equals(contrasena)) {
                 return true;
             }
         }
         return false;
     }
 
-    public void mostrarOpciones(Estudiante estudiante) {
-        System.out.println("Opciones para " + estudiante.getNombre());
-        System.out.println("Materias disponibles:");
-        for (Materia m : materiasOfertadas) {
-            System.out.println(m.getNombre() + " - Clases: ");
-            for (Clase c : m.getClasesDisponibles()) {
-                System.out.println("  " + c.getHorario() + " Cupos: " + c.getCuposDisponibles());
+    public Estudiante buscarEstudiante(String codigo) {
+        for (Estudiante e : usuarios) {
+            if (e.getCodigo().equals(codigo)) {
+                return e;
             }
         }
-    }
-
-    public void agregarUsuario(Estudiante e) {
-        usuarios.add(e);
+        return null;
     }
 
     public List<Materia> getMateriasOfertadas() {
         return materiasOfertadas;
-    }
-
-    public boolean isSesionActiva() {
-        return sesionActiva;
     }
 
     public List<Estudiante> getUsuarios() {

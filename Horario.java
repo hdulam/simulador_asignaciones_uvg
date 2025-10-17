@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -6,19 +5,13 @@ public class Horario {
 
     private List<String> entradas;
 
-    public Horario() {
-        this.entradas = new ArrayList<>();
-    }
+    public Horario() { this.entradas = new ArrayList<>(); }
 
-    public void agregarMateria(String nombre, String horarioStr) {
-        entradas.add(nombre + " - " + horarioStr);
-    }
+    public void agregarMateria(String nombre, String horarioStr) { entradas.add(nombre + " - " + horarioStr); }
 
     public boolean verificarConflictos(String nuevoHorario) {
         for (String e : entradas) {
-            if (e.contains(nuevoHorario)) {
-                return false;
-            }
+            if (e.contains(nuevoHorario)) return false;
         }
         return true;
     }
@@ -27,8 +20,5 @@ public class Horario {
         for (String e : entradas) {
             System.out.println(e);
         }
-    }
-    public List<String> getEntradas() {
-        return entradas;
     }
 }
