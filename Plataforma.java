@@ -1,16 +1,34 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Plataforma {
+public class Plataforma implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private static Plataforma instance;
 
     private List<Estudiante> usuarios;
     private List<Materia> materiasOfertadas;
 
-    public Plataforma() {
+    private final String USERS_FILE = "usuarios.dat";
+    private final String MATERIAS_FILE = "materias.dat";
+
+    private Plataforma() {
         this.usuarios = new ArrayList<>();
         this.materiasOfertadas = new ArrayList<>();
-        inicializarMaterias();
-        inicializarUsuarios();
+        // intentar cargar persistencia; si no existe, inicializar por defecto
+        if (!load()) {
+            inicializarMaterias();
+            inicializarUsuarios();
+            save();
+        }
+    }
+
+    public static Plataforma getInstance() {
+        if (instance == null) {
+            instance = new Plataforma();
+        }
+        return instance;
     }
 
     private void inicializarMaterias() {
@@ -32,15 +50,14 @@ public class Plataforma {
     }
 
     private void inicializarUsuarios() {
-        usuarios.add(new Estudiante("Juan Pérez", "25932"));
-        usuarios.add(new Estudiante("Ana Gómez", "251293"));
-        usuarios.add(new Estudiante("Luis Martínez", "251190"));
+        usuarios.add(new Estudiante("Juan Pérez", "25932", "Ingenieria", "juan25932"));
+        usuarios.add(new Estudiante("Ana Gómez", "251293", "Medicina", "ana251293"));
+        usuarios.add(new Estudiante("Luis Martínez", "251190", "Arquitectura", "luis251190"));
     }
 
     public boolean iniciarSesion(String codigo, String contrasena) {
-        // Contraseña fija "123"
         for (Estudiante e : usuarios) {
-            if (e.getCodigo().equals(codigo) && "123".equals(contrasena)) {
+            if (e.getCodigo().equals(codigo) && e.checkPassword(contrasena)) {
                 return true;
             }
         }
@@ -49,9 +66,14 @@ public class Plataforma {
 
     public Estudiante buscarEstudiante(String codigo) {
         for (Estudiante e : usuarios) {
-            if (e.getCodigo().equals(codigo)) {
-                return e;
-            }
+            if (e.getCodigo().equals(codigo)) return e;
+        }
+        return null;
+    }
+
+    public Materia buscarMateria(String nombre) {
+        for (Materia m : materiasOfertadas) {
+            if (m.getNombre().equalsIgnoreCase(nombre)) return m;
         }
         return null;
     }
@@ -62,5 +84,31 @@ public class Plataforma {
 
     public List<Estudiante> getUsuarios() {
         return usuarios;
+    }
+
+    // Persistencia
+    public boolean save() {
+        try (ObjectOutputStream oosUsers = new ObjectOutputStream(new FileOutputStream(USERS_FILE));
+             ObjectOutputStream oosMaterias = new ObjectOutputStream(new FileOutputStream(MATERIAS_FILE))) {
+            oosUsers.writeObject(usuarios);
+            oosMaterias.writeObject(materiasOfertadas);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean load() {
+        try (ObjectInputStream oisUsers = new ObjectInputStream(new FileInputStream(USERS_FILE));
+             ObjectInputStream oisMaterias = new ObjectInputStream(new FileInputStream(MATERIAS_FILE))) {
+            usuarios = (List<Estudiante>) oisUsers.readObject();
+            materiasOfertadas = (List<Materia>) oisMaterias.readObject();
+            return true;
+        } catch (IOException | ClassNotFoundException e) {
+            // archivos no existen o fallo: iniciar por defecto
+            return false;
+        }
     }
 }

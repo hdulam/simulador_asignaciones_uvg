@@ -1,6 +1,7 @@
-import javax.swing.JOptionPane;
+import java.io.Serializable;
 
-public class Clase {
+public class Clase implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String horario;
     private int cuposDisponibles;
@@ -15,15 +16,24 @@ public class Clase {
     public String getHorario() { return horario; }
     public int getCuposDisponibles() { return cuposDisponibles; }
 
-    public boolean asignarCupo(Estudiante estudiante) {
+    public synchronized boolean asignarCupo(Estudiante estudiante) {
         if (cuposDisponibles > 0) {
             cuposDisponibles--;
             estudiantesAsignados++;
-            JOptionPane.showMessageDialog(null, "Cupo asignado. Quedan " + cuposDisponibles + " cupos.");
+            // Notificar (sin dependencias GUI en la lógica de negocio idealmente)
+            System.out.println("Cupo asignado. Quedan " + cuposDisponibles + " cupos.");
             return true;
         } else {
-            JOptionPane.showMessageDialog(null, "No hay cupos disponibles en este horario.");
+            System.out.println("No hay cupos disponibles en este horario.");
             return false;
+        }
+    }
+
+    public synchronized void liberarCupo() {
+        if (estudiantesAsignados > 0) {
+            estudiantesAsignados--;
+            cuposDisponibles++;
+            System.out.println("Cupo liberado. Quedan " + cuposDisponibles + " cupos.");
         }
     }
 }

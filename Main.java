@@ -1,14 +1,29 @@
 public class Main {
-
     public static void main(String[] args) {
-        Materia poo = new Materia("POO");
-        poo.agregarClase(new Clase("Lunes 8-10", 2));
-        poo.agregarClase(new Clase("Martes 10-12", 1));
-        poo.agregarClase(new Clase("Viernes 14-16", 3));
+        Plataforma plataforma = Plataforma.getInstance();
 
-        Estudiante e1 = new Estudiante("Juan Pérez", "2025001");
-        e1.inscribirClase(poo, poo.getClasesDisponibles().get(1));
-        e1.inscribirClase(poo, poo.getClasesDisponibles().get(0));
-        e1.verHorario();
+        // Mostrar materias
+        System.out.println("Materias ofertadas:");
+        for (Materia m : plataforma.getMateriasOfertadas()) {
+            System.out.println("- " + m.getNombre());
+        }
+
+        // Crear un estudiante de prueba (si no existe)
+        Estudiante e = plataforma.buscarEstudiante("25932");
+        if (e == null) {
+            e = new Estudiante("Prueba", "25932", "Ingenieria", "prueba123");
+            plataforma.getUsuarios().add(e);
+            plataforma.save();
+        }
+
+        // Simular inscripcion con Inscripcion
+        Materia poo = plataforma.buscarMateria("POO");
+        if (poo != null) {
+            Inscripcion ins = new Inscripcion();
+            ins.procesarInscripcion(e, poo);
+            plataforma.save();
+        }
+
+        System.out.println("Ejecución finalizada.");
     }
 }

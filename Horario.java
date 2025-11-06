@@ -1,7 +1,9 @@
-import java.util.List;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
-public class Horario {
+public class Horario implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private List<String> entradas;
 
@@ -14,14 +16,14 @@ public class Horario {
     }
 
     public boolean verificarConflictos(String nuevoHorario) {
+        // Implementación simple: evita igualdad exacta; se puede mejorar para solapamientos reales.
         for (String e : entradas) {
-            // Cambio: detectar solapamiento parcial (simplificado)
             String horarioExistente = e.split(" - ")[1];
-            if (horarioExistente.equals(nuevoHorario)) {
-                return false;
+            if (horarioExistente.equalsIgnoreCase(nuevoHorario)) {
+                return false; // conflicto
             }
         }
-        return true;
+        return true; // sin conflicto
     }
 
     public void mostrarHorario() {
@@ -30,7 +32,6 @@ public class Horario {
         }
     }
 
-    // Nuevo método agregado
     public String getHorarioComoString() {
         StringBuilder sb = new StringBuilder();
         for (String e : entradas) {
@@ -41,5 +42,9 @@ public class Horario {
 
     public List<String> getEntradas() {
         return new ArrayList<>(entradas);
+    }
+
+    public void removerMateria(String nombre) {
+        entradas.removeIf(s -> s.startsWith(nombre + " - "));
     }
 }
