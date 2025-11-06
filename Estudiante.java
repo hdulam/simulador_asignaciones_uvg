@@ -1,40 +1,65 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
+
 import javax.swing.JOptionPane;
 
-public class Estudiante {
+public class Estudiante implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String nombre;
     private String codigo;
     private String carrera;
+    private String contraseña; // contraseña individual
     private Map<Materia, Clase> inscripciones;
     private Horario horario;
 
     public Estudiante(String nombre, String codigo) {
-        this(nombre, codigo, "Ingeniería");
+        this(nombre, codigo, "Ingenieria", "123"); // default password (se recomienda cambiar)
     }
 
     public Estudiante(String nombre, String codigo, String carrera) {
+        this(nombre, codigo, carrera, "123");
+    }
+
+    public Estudiante(String nombre, String codigo, String carrera, String contraseña) {
         this.nombre = nombre;
         this.codigo = codigo;
         this.carrera = carrera;
+        this.contraseña = contraseña;
         this.inscripciones = new HashMap<>();
         this.horario = new Horario();
     }
 
+    public boolean checkPassword(String pass) {
+        return contraseña != null && contraseña.equals(pass);
+    }
+
+    public void setContraseña(String nueva) {
+        this.contraseña = nueva;
+    }
+
     public void inscribirClase(Materia materia, Clase clase) {
-        if (horario.verificarConflictos(clase.getHorario())) {
-            if (clase.asignarCupo(this)) {
-                inscripciones.put(materia, clase);
-                horario.agregarMateria(materia.getNombre(), clase.getHorario());
-                JOptionPane.showMessageDialog(null, "Inscrito en: " + materia.getNombre() + " - " + clase.getHorario());
-            } else {
-                JOptionPane.showMessageDialog(null, "No hay cupos disponibles en " + materia.getNombre());
-            }
+        if (!horario.verificarConflictos(clase.getHorario())) {
+            JOptionPane.showMessageDialog(null, "Conflicto de horario al intentar inscribirse en " + materia.getNombre());
+            return;
+        }
+        if (clase.asignarCupo(this)) {
+            inscripciones.put(materia, clase);
+            horario.agregarMateria(materia.getNombre(), clase.getHorario());
+            JOptionPane.showMessageDialog(null, "Inscrito en: " + materia.getNombre() + " - " + clase.getHorario());
         } else {
-            JOptionPane.showMessageDialog(null, "Conflicto de horario con otra materia al intentar inscribirse en " + materia.getNombre());
+            JOptionPane.showMessageDialog(null, "No hay cupos disponibles en " + materia.getNombre());
+        }
+    }
+
+    public void desinscribirClase(Materia materia) {
+        Clase c = inscripciones.remove(materia);
+        if (c != null) {
+            c.liberarCupo();
+            horario.removerMateria(materia.getNombre());
+            JOptionPane.showMessageDialog(null, "Se ha desinscrito de " + materia.getNombre());
+        } else {
+            JOptionPane.showMessageDialog(null, "No está inscrito en " + materia.getNombre());
         }
     }
 
@@ -47,6 +72,7 @@ public class Estudiante {
               .append(entry.getValue().getHorario())
               .append("\n");
         }
+        if (inscripciones.isEmpty()) sb.append("No hay clases inscritas\n");
         JOptionPane.showMessageDialog(null, sb.toString(), "Horario", JOptionPane.INFORMATION_MESSAGE);
     }
 

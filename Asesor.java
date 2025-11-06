@@ -1,7 +1,10 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 
-public class Asesor {
+public class Asesor implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String nombre;
     private List<Estudiante> estudiantesAsignados;
@@ -19,11 +22,9 @@ public class Asesor {
 
     public void recomendarMateria(Estudiante estudiante) {
         String recomendacion = getRecomendacion(estudiante);
-        // cambio: mostrar recomendación por popup en GUI
-        javax.swing.JOptionPane.showMessageDialog(null, recomendacion, "Recomendación", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, recomendacion, "Recomendación", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Nuevo método agregado
     public String getRecomendacion(Estudiante estudiante) {
         String carrera = estudiante.getCarrera();
         if ("Ingenieria".equalsIgnoreCase(carrera)) {
@@ -33,7 +34,7 @@ public class Asesor {
         } else if ("Arquitectura".equalsIgnoreCase(carrera)) {
             return "Recomendado: Dibujo y Diseño";
         } else {
-            return "Materias básicas: Matematicas";
+            return "Materias básicas: Matemáticas";
         }
     }
 
