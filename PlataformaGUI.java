@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.FileOutputStream;
 import java.util.Map;
 import com.itextpdf.text.Document;
@@ -16,27 +14,30 @@ public class PlataformaGUI extends JFrame {
     private JTextField codigoField;
     private JPasswordField passField;
     private JTextArea materiasArea;
-    private JButton loginBtn, inscribirBtn, verHorarioBtn, recomendarBtn, pdfBtn;
+    private JButton loginBtn, inscribirBtn, verHorarioBtn, recomendarBtn, pdfBtn, desinscribirBtn;
     private Estudiante estudianteActual;
     private JComboBox<String> materiasCombo;
 
     public PlataformaGUI() {
-        plataforma = new Plataforma();
+        plataforma = Plataforma.getInstance(); // singleton accesible
         setTitle("Sistema de Inscripción");
-        setSize(600, 450);
+        setSize(800, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
         // --- Login panel ---
-        JPanel loginPanel = new JPanel(new GridLayout(3, 2));
+        JPanel loginPanel = new JPanel(new GridLayout(3, 3));
         loginPanel.add(new JLabel("Código:"));
         codigoField = new JTextField();
         loginPanel.add(codigoField);
+        loginPanel.add(new JLabel(""));
         loginPanel.add(new JLabel("Contraseña:"));
         passField = new JPasswordField();
         loginPanel.add(passField);
         loginBtn = new JButton("Login");
         loginPanel.add(loginBtn);
+        loginPanel.add(new JLabel(""));
+        loginPanel.add(new JLabel(""));
         loginPanel.add(new JLabel(""));
         add(loginPanel, BorderLayout.NORTH);
 
@@ -46,12 +47,14 @@ public class PlataformaGUI extends JFrame {
         add(new JScrollPane(materiasArea), BorderLayout.CENTER);
 
         // --- Botones ---
-        JPanel botonesPanel = new JPanel(new GridLayout(1, 4));
+        JPanel botonesPanel = new JPanel(new GridLayout(1, 5));
         inscribirBtn = new JButton("Inscribir");
+        desinscribirBtn = new JButton("Desinscribir");
         verHorarioBtn = new JButton("Ver Horario");
         recomendarBtn = new JButton("Recomendar");
         pdfBtn = new JButton("Generar PDF");
         botonesPanel.add(inscribirBtn);
+        botonesPanel.add(desinscribirBtn);
         botonesPanel.add(verHorarioBtn);
         botonesPanel.add(recomendarBtn);
         botonesPanel.add(pdfBtn);
@@ -59,87 +62,90 @@ public class PlataformaGUI extends JFrame {
 
         // --- Combo materias ---
         materiasCombo = new JComboBox<>();
-        add(materiasCombo, BorderLayout.EAST);
+        JPanel east = new JPanel(new BorderLayout());
+        east.add(new JLabel("Seleccionar materia:"), BorderLayout.NORTH);
+        east.add(materiasCombo, BorderLayout.CENTER);
+        add(east, BorderLayout.EAST);
 
-        // --- Login action ---
+        // --- Actions ---
         loginBtn.addActionListener(e -> {
-            String codigo = codigoField.getText();
+            String codigo = codigoField.getText().trim();
             String pass = new String(passField.getPassword());
             if (plataforma.iniciarSesion(codigo, pass)) {
-                estudianteActual = buscarEstudiante(codigo);
-                JOptionPane.showMessageDialog(null, "Login exitoso: " + estudianteActual.getNombre());
+                estudianteActual = plataforma.buscarEstudiante(codigo);
+                JOptionPane.showMessageDialog(this, "Login exitoso: " + estudianteActual.getNombre());
                 mostrarMaterias();
             } else {
-                JOptionPane.showMessageDialog(null, "Login fallido");
+                JOptionPane.showMessageDialog(this, "Login fallido");
             }
         });
 
-        // --- Inscribir action ---
         inscribirBtn.addActionListener(e -> {
             if (estudianteActual != null && materiasCombo.getSelectedItem() != null) {
                 String matSel = (String) materiasCombo.getSelectedItem();
-                Materia mat = buscarMateria(matSel);
-                if (mat != null) {
-                    Clase cl = null;
-                    for (Clase cc : mat.getClasesDisponibles()) {
-                        if (cc.getCuposDisponibles() > 0) {
-                            cl = cc;
-                            break;
-                        }
-                    }
+                Materia m = plataforma.buscarMateria(matSel);
+                if (m != null) {
+                    Clase cl = m.getClaseDisponible();
                     if (cl != null) {
-                        estudianteActual.inscribirClase(mat, cl);
+                        estudianteActual.inscribirClase(m, cl);
+                        plataforma.save(); // persistir cambios
                         mostrarMaterias();
                     } else {
-                        JOptionPane.showMessageDialog(null, "No hay cupos disponibles");
+                        JOptionPane.showMessageDialog(this, "No hay cupos disponibles");
                     }
                 }
+            } else {
+                JOptionPane.showMessageDialog(this, "Debe iniciar sesión y seleccionar una materia");
             }
         });
 
-        // --- Ver horario action ---
+        desinscribirBtn.addActionListener(e -> {
+            if (estudianteActual != null && materiasCombo.getSelectedItem() != null) {
+                String matSel = (String) materiasCombo.getSelectedItem();
+                Materia m = plataforma.buscarMateria(matSel);
+                if (m != null) {
+                    estudianteActual.desinscribirClase(m);
+                    plataforma.save();
+                    mostrarMaterias();
+                    JOptionPane.showMessageDialog(this, "Desinscripción realizada");
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Debe iniciar sesión y seleccionar una materia");
+            }
+        });
+
         verHorarioBtn.addActionListener(e -> {
             if (estudianteActual != null) {
-                StringBuilder sb = new StringBuilder("Horario de " + estudianteActual.getNombre() + ":\n\n");
-                for (Map.Entry<Materia, Clase> entry : estudianteActual.getInscripciones().entrySet()) {
-                    sb.append(entry.getKey().getNombre()).append(" - ").append(entry.getValue().getHorario()).append("\n");
-                }
-                if (sb.toString().equals("Horario de " + estudianteActual.getNombre() + ":\n\n")) {
-                    sb.append("No hay clases inscritas");
-                }
-                JOptionPane.showMessageDialog(null, sb.toString());
+                estudianteActual.verHorario();
+            } else {
+                JOptionPane.showMessageDialog(this, "Inicie sesión primero");
             }
         });
 
-        // --- Recomendar action ---
         recomendarBtn.addActionListener(e -> {
             if (estudianteActual != null) {
                 Asesor asesor = new Asesor("Asesor Principal");
-                String carrera = estudianteActual.getCarrera();
-                String recomendacion;
-                if ("Ingenieria".equals(carrera)) {
-                    recomendacion = "Recomendado: POO y Calculo";
-                } else if ("Medicina".equals(carrera)) {
-                    recomendacion = "Recomendado: Biologia y Quimica";
-                } else {
-                    recomendacion = "Materias básicas: Matemáticas";
-                }
-                JOptionPane.showMessageDialog(null, recomendacion);
+                String recomendacion = asesor.getRecomendacion(estudianteActual);
+                JOptionPane.showMessageDialog(this, recomendacion, "Recomendación", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Inicie sesión primero");
             }
         });
 
-        // --- Generar PDF action ---
         pdfBtn.addActionListener(e -> {
             if (estudianteActual != null) {
                 generarPDF();
+            } else {
+                JOptionPane.showMessageDialog(this, "Inicie sesión primero");
             }
         });
 
+        mostrarMaterias();
         setVisible(true);
     }
 
     private void mostrarMaterias() {
-        materiasArea.setText("Materias disponibles:\n");
+        materiasArea.setText("Materias disponibles:\n\n");
         materiasCombo.removeAllItems();
         for (Materia m : plataforma.getMateriasOfertadas()) {
             String linea = m.getNombre() + "\n";
@@ -149,24 +155,6 @@ public class PlataformaGUI extends JFrame {
             materiasArea.append(linea + "\n");
             materiasCombo.addItem(m.getNombre());
         }
-    }
-
-    private Estudiante buscarEstudiante(String codigo) {
-        for (Estudiante e : plataforma.getUsuarios()) {
-            if (e.getCodigo().equals(codigo)) {
-                return e;
-            }
-        }
-        return null;
-    }
-
-    private Materia buscarMateria(String nombre) {
-        for (Materia m : plataforma.getMateriasOfertadas()) {
-            if (m.getNombre().equals(nombre)) {
-                return m;
-            }
-        }
-        return null;
     }
 
     private void generarPDF() {
@@ -191,10 +179,10 @@ public class PlataformaGUI extends JFrame {
             }
             doc.add(tabla);
             doc.close();
-            JOptionPane.showMessageDialog(null, "PDF generado: " + file);
+            JOptionPane.showMessageDialog(this, "PDF generado: " + file);
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error al generar PDF");
+            JOptionPane.showMessageDialog(this, "Error al generar PDF (revisar librería iText).");
         }
     }
 
