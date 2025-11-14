@@ -10,16 +10,14 @@ public class Inscripcion implements Serializable {
     public void procesarInscripcion(Estudiante estudiante, Materia materia) {
         this.fecha = new Date();
         Clase clase = materia.getClaseDisponible();
+
         if (clase != null) {
-            if (clase.asignarCupo(estudiante)) {
-                this.estado = "aprobada";
-                estudiante.inscribirClase(materia, clase);
-            } else {
-                this.estado = "rechazada";
-            }
+            estudiante.inscribirClase(materia, clase);
+            this.estado = "aprobada";
         } else {
             this.estado = "rechazada";
         }
+
         enviarNotificacion("Inscripción " + estado + " para " + materia.getNombre());
     }
 
