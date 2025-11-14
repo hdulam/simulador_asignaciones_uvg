@@ -16,32 +16,20 @@ public class Horario implements Serializable {
     }
 
     public boolean verificarConflictos(String nuevoHorario) {
-        // Implementación simple: evita igualdad exacta; se puede mejorar para solapamientos reales.
         for (String e : entradas) {
             String horarioExistente = e.split(" - ")[1];
             if (horarioExistente.equalsIgnoreCase(nuevoHorario)) {
-                return false; // conflicto
+                return false;
             }
         }
-        return true; // sin conflicto
-    }
-
-    public void mostrarHorario() {
-        for (String e : entradas) {
-            System.out.println(e);
-        }
+        return true;
     }
 
     public String getHorarioComoString() {
+        if (entradas.isEmpty()) return "No hay clases inscritas.";
         StringBuilder sb = new StringBuilder();
-        for (String e : entradas) {
-            sb.append(e).append("\n");
-        }
+        for (String e : entradas) sb.append(e).append("\n");
         return sb.toString();
-    }
-
-    public List<String> getEntradas() {
-        return new ArrayList<>(entradas);
     }
 
     public void removerMateria(String nombre) {
