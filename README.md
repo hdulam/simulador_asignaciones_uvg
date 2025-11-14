@@ -58,6 +58,6 @@ java -cp ".:libs/itextpdf-5.5.13.jar" PlataformaGUI
 ## Usuarios predefinidos para testing:
 | Usuario (código) | Contraseña | Carrera    |
 | ---------------- | ---------- | ---------- |
-| 25932          | 123        | Ingeniería |
-| 251293          | 123        | Medicina   |
-| 251190          | 123        | Ingeniería |
+| 25932          | juan25932        | Ingeniería |
+| 251293          | ana251293        | Medicina   |
+| 251190          | luis251190        | Ingeniería |
