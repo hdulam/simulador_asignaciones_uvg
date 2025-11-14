@@ -15,16 +15,8 @@ public class Materia implements Serializable {
 
     public void agregarClase(Clase clase) { clases.add(clase); }
 
-    public List<Clase> getClasesDisponibles() { return new ArrayList<>(clases); }
-
-    public List<Clase> getClasesDisponiblesConCupos() {
-        List<Clase> disponibles = new ArrayList<>();
-        for (Clase c : clases) {
-            if (c.getCuposDisponibles() > 0) {
-                disponibles.add(c);
-            }
-        }
-        return disponibles;
+    public List<Clase> getClasesDisponibles() {
+        return new ArrayList<>(clases);
     }
 
     public Clase getClaseDisponible() {

@@ -20,20 +20,20 @@ public class Clase implements Serializable {
         if (cuposDisponibles > 0) {
             cuposDisponibles--;
             estudiantesAsignados++;
-            // Notificar (sin dependencias GUI en la lógica de negocio idealmente)
-            System.out.println("Cupo asignado. Quedan " + cuposDisponibles + " cupos.");
             return true;
-        } else {
-            System.out.println("No hay cupos disponibles en este horario.");
-            return false;
         }
+        return false;
     }
 
     public synchronized void liberarCupo() {
         if (estudiantesAsignados > 0) {
             estudiantesAsignados--;
             cuposDisponibles++;
-            System.out.println("Cupo liberado. Quedan " + cuposDisponibles + " cupos.");
         }
+    }
+
+    @Override
+    public String toString() {
+        return horario + " - Cupos: " + cuposDisponibles;
     }
 }

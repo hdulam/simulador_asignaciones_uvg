@@ -14,9 +14,9 @@ public class Plataforma implements Serializable {
     private final String MATERIAS_FILE = "materias.dat";
 
     private Plataforma() {
-        this.usuarios = new ArrayList<>();
-        this.materiasOfertadas = new ArrayList<>();
-        // intentar cargar persistencia; si no existe, inicializar por defecto
+        usuarios = new ArrayList<>();
+        materiasOfertadas = new ArrayList<>();
+
         if (!load()) {
             inicializarMaterias();
             inicializarUsuarios();
@@ -25,28 +25,23 @@ public class Plataforma implements Serializable {
     }
 
     public static Plataforma getInstance() {
-        if (instance == null) {
-            instance = new Plataforma();
-        }
+        if (instance == null) instance = new Plataforma();
         return instance;
     }
 
     private void inicializarMaterias() {
         Materia poo = new Materia("POO");
         poo.agregarClase(new Clase("Lunes 8-10", 30));
+        poo.agregarClase(new Clase("Martes 10-12", 25));
         materiasOfertadas.add(poo);
 
-        Materia mat = new Materia("Matematicas");
-        mat.agregarClase(new Clase("Martes 10-12", 40));
+        Materia mat = new Materia("Matemáticas");
+        mat.agregarClase(new Clase("Martes 14-16", 40));
         materiasOfertadas.add(mat);
 
-        Materia fis = new Materia("Fisica");
-        fis.agregarClase(new Clase("Miercoles 8-10", 25));
+        Materia fis = new Materia("Física");
+        fis.agregarClase(new Clase("Miércoles 8-10", 30));
         materiasOfertadas.add(fis);
-
-        Materia cal = new Materia("Calculo");
-        cal.agregarClase(new Clase("Lunes 14-16", 35));
-        materiasOfertadas.add(cal);
     }
 
     private void inicializarUsuarios() {
@@ -57,9 +52,7 @@ public class Plataforma implements Serializable {
 
     public boolean iniciarSesion(String codigo, String contrasena) {
         for (Estudiante e : usuarios) {
-            if (e.getCodigo().equals(codigo) && e.checkPassword(contrasena)) {
-                return true;
-            }
+            if (e.getCodigo().equals(codigo) && e.checkPassword(contrasena)) return true;
         }
         return false;
     }
@@ -86,15 +79,15 @@ public class Plataforma implements Serializable {
         return usuarios;
     }
 
-    // Persistencia
     public boolean save() {
         try (ObjectOutputStream oosUsers = new ObjectOutputStream(new FileOutputStream(USERS_FILE));
              ObjectOutputStream oosMaterias = new ObjectOutputStream(new FileOutputStream(MATERIAS_FILE))) {
+
             oosUsers.writeObject(usuarios);
             oosMaterias.writeObject(materiasOfertadas);
             return true;
+
         } catch (IOException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -103,11 +96,12 @@ public class Plataforma implements Serializable {
     public boolean load() {
         try (ObjectInputStream oisUsers = new ObjectInputStream(new FileInputStream(USERS_FILE));
              ObjectInputStream oisMaterias = new ObjectInputStream(new FileInputStream(MATERIAS_FILE))) {
+
             usuarios = (List<Estudiante>) oisUsers.readObject();
             materiasOfertadas = (List<Materia>) oisMaterias.readObject();
             return true;
+
         } catch (IOException | ClassNotFoundException e) {
-            // archivos no existen o fallo: iniciar por defecto
             return false;
         }
     }
